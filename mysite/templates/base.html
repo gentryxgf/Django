@@ -99,6 +99,7 @@
       </div>
     </div>
     <script type="text/javascript">
+
         $("#login_modal_form").submit(function(event){
             event.preventDefault();
             $.ajax({
@@ -115,6 +116,16 @@
                }
             });
         });
+        //返回上一页并不提交表单数据
+        function back_1() {
+        window.history.go(-1);
+        //动作：阻止表单数据提交
+         return false;
+        }
+        function back_home(){
+            window.location.href='/';
+            return false;
+        }
     </script>
     {% block script_extends %}{% endblock %}
 </body>

@@ -84,14 +84,20 @@ def user_info(request):
 
 def change_nickname(request):
     redirect_to = request.GET.get('from', reverse('home'))
+    print("********************************")
+    print(request)
     if request.method == 'POST':
+        print("1111111111111111111111111111111111111111111111111111")
         form = ChangeNicknameForm(request.POST, user=request.user)
+        print("222222222222222222222222222222222222222222222222222")
         if form.is_valid():
             nickname_new = form.cleaned_data['nickname_new']
             profile, created = Profile.objects.get_or_create(user=request.user)
             profile.nickname = nickname_new
             profile.save()
+            print("3333333333333333333333333333333333333333333333")
             return redirect(redirect_to)
+            print("4444444444444444444444444444444444444")
     else:
         form = ChangeNicknameForm()
     context = {}
@@ -100,6 +106,8 @@ def change_nickname(request):
     context['submit_text'] = '修改'
     context['form'] = form
     context['return_back_url'] = redirect_to
+    print(context)
+    print(request)
     return render(request, 'form.html', context)
 
 def bind_email(request):
