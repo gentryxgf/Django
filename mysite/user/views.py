@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 from django.contrib import auth
 from django.urls import reverse
 from django.core.mail import send_mail
-from user.forms import LoginForm, RegForm, ChangeNicknameForm, BindEmailForm
+from user.forms import LoginForm, RegForm, ChangeNicknameForm, BindEmailForm, ChangePasswordForm, ForgotPasswordForm
 from .models import Profile
 from django.http import JsonResponse
 
@@ -56,7 +56,7 @@ def login_for_modal(request):
 
 def register(request):
     if request.method == 'POST':
-        reg_form = RegForm(request.POST)
+        reg_form = RegForm(request.POST, request=request)
         if reg_form.is_valid():
             username = reg_form.cleaned_data['username']
             email = reg_form.cleaned_data['email']
@@ -64,6 +64,8 @@ def register(request):
             #创建用户
             user = User.objects.create_user(username, email, password)
             user.save()
+            #清楚session
+            del request.session['register_code']
             #登录用户
             user = auth.authenticate(username=username, password=password)
             auth.login(request, user)
@@ -84,20 +86,14 @@ def user_info(request):
 
 def change_nickname(request):
     redirect_to = request.GET.get('from', reverse('home'))
-    print("********************************")
-    print(request)
     if request.method == 'POST':
-        print("1111111111111111111111111111111111111111111111111111")
         form = ChangeNicknameForm(request.POST, user=request.user)
-        print("222222222222222222222222222222222222222222222222222")
         if form.is_valid():
             nickname_new = form.cleaned_data['nickname_new']
             profile, created = Profile.objects.get_or_create(user=request.user)
             profile.nickname = nickname_new
             profile.save()
-            print("3333333333333333333333333333333333333333333333")
             return redirect(redirect_to)
-            print("4444444444444444444444444444444444444")
     else:
         form = ChangeNicknameForm()
     context = {}
@@ -106,8 +102,6 @@ def change_nickname(request):
     context['submit_text'] = '修改'
     context['form'] = form
     context['return_back_url'] = redirect_to
-    print(context)
-    print(request)
     return render(request, 'form.html', context)
 
 def bind_email(request):
@@ -118,6 +112,8 @@ def bind_email(request):
             email = form.cleaned_data['email']
             request.user.email = email
             request.user.save()
+            #清除session
+            del request.session['bind_email_code']
             return redirect(redirect_to)
     else:
         form = BindEmailForm()
@@ -131,6 +127,7 @@ def bind_email(request):
 
 def send_verification_code(request):
     email = request.GET.get('email', '')
+    send_for = request.GET.get('send_for', '')
     data = {}
     if email != '':
         now = int(time.time())
@@ -140,11 +137,11 @@ def send_verification_code(request):
         else:
             #生成验证码
             code = ''.join(random.sample(string.ascii_letters + string.digits, 4))
-            request.session['bind_email_code'] = code
+            request.session[send_for] = code
             request.session['send_code_time'] = now
             #发送邮件
             send_mail(
-                '绑定邮箱',
+                '来自X博客的邮箱验证',
                 '验证码：%s' % code,
                 '3607874906@qq.com',
                 [email],
@@ -155,3 +152,47 @@ def send_verification_code(request):
         data['status'] = 'ERROR'
 
     return JsonResponse(data)
+
+def change_password(request):
+    redirect_to = reverse('home')
+    if request.method == 'POST':
+        form = ChangePasswordForm(request.POST, user=request.user)
+        if form.is_valid():
+            user = request.user
+            new_password = form.cleaned_data['new_password']
+            user.set_password(new_password)
+            user.save()
+            auth.logout(request)
+            return redirect(redirect_to)
+    else:
+        form = ChangePasswordForm()
+    context = {}
+    context['page_title'] = '修改密码'
+    context['form_title'] = '修改密码'
+    context['submit_text'] = '修改'
+    context['form'] = form
+    context['return_back_url'] = redirect_to
+    return render(request, 'form.html', context)
+
+def forgot_password(request):
+    redirect_to = reverse('home')
+    if request.method == 'POST':
+        form = ForgotPasswordForm(request.POST, request=request)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            new_password = form.cleaned_data['new_password']
+            user = User.objects.get(email=email)
+            user.set_password(new_password)
+            user.save()
+            # 清除session
+            del request.session['forgot_password_code']
+            return redirect(redirect_to)
+    else:
+        form = ForgotPasswordForm()
+    context = {}
+    context['page_title'] = '重置密码'
+    context['form_title'] = '重置密码'
+    context['submit_text'] = '重置'
+    context['form'] = form
+    context['return_back_url'] = redirect_to
+    return render(request, 'user/forgot_password.html', context)
