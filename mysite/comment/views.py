@@ -3,10 +3,12 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.mail import send_mail
 from django.conf import settings
 from django.urls import reverse
+from django.utils.html import strip_tags
 from django.http import JsonResponse
 from .models import Comment
 from .forms import CommentForm
-# Create your views here.
+from notifications.signals import notify
+
 
 def update_comment(request):
     """referer = request.META.get('HTTP_REFERER', reverse('home'))
@@ -46,8 +48,28 @@ def update_comment(request):
             comment.parent = parent
             comment.reply_to = parent.user
         comment.save()
-        #发送邮件
-        comment.send_mail()
+
+        """
+        .signals信号发送器
+        if comment.reply_to is None:
+            #是评论
+            recipient = comment.content_object.get_user()
+            if comment.content_type.model == 'blog':
+                blog = comment.content_object
+                verb = '{0} 评论了你的 《{1}》'.format(comment.user.get_nickname_or_username(), blog.title)
+            else:
+                raise Exception('Unknow comment object type')
+        else:
+            #是回复
+            recipient = comment.reply_to
+            verb = '{0} 回复了你的评论“{1}”'.format(comment.user.get_nickname_or_username(), strip_tags(comment.parent.text))
+        #发送消息
+        notify.send(comment.user, recipient=recipient, verb=verb, action_object=comment)
+        """
+
+        # 发送邮件
+        # 信号发送器重构
+        # comment.send_mail()
 
         data['status'] = 'SUCCESS'
         data['username'] = comment.user.get_nickname_or_username()

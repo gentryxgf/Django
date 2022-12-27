@@ -22,17 +22,30 @@
                         {% csrf_token %}
                         {% for field in reg_form %}
                             <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {% if field.id_for_label == 'id_email' %}
+                            <div class="input-group">
                             {{ field }}
+                                <span class="input-group-btn">
+                                    <button id="send_code" class="btn btn-default">发送验证码</button>
+                                </span>
+                            </div>
+                            {% else %}
+                            {{ field }}
+                            {% endif %}
                             <p class="text-danger">{{ field.errors.as_text }}</p>
                         {% endfor %}
                         <span class="pull-left text-danger"> {{ reg_form.non_field_errors }}</span>
                         <div class="clearfix"></div>
-                        <button id="send_code" class="btn btn-primary">发送验证码</button>
                         <input type="submit" value="注册" class="btn btn-primary pull-right">
                         <button class="btn btn-default" onclick="return back_home()">取消注册</button>
                     </form>
                   </div>
                 </div>
+                {% if request.GET.from %}
+                <a href="{% url 'login' %}?from={{ request.GET.from }}" style="text-align: right; display: block;">已有账号？前往登录&gt;&gt;</a>
+                {% else %}
+                <a href="{% url 'login' %}?from={{ request.get_full_path }}" style="text-align: right; display: block;">已有账号？前往登录&gt;&gt;</a>
+                {% endif %}
                 {% else %}
                     <span>未登录，跳转到首页...</span>
                     <script type="text/javascript">

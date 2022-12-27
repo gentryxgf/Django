@@ -13,6 +13,7 @@ from blog.models import Blog
 from user.forms import LoginForm, RegForm
 from django.http import JsonResponse
 
+
 def get_7_days_hot_blogs():
     today = timezone.now().date()
     date = today - datetime.timedelta(days=7)
@@ -22,6 +23,7 @@ def get_7_days_hot_blogs():
                         .order_by('-read_num_sum')
     return blogs[:7]
 
+
 def get_hot_blogs(day):
     """
     :param day: (int)以当前日期往前的一段时间。eg. 0表示获取当天的热点博客
@@ -30,7 +32,7 @@ def get_hot_blogs(day):
     """
     day = int(day)
     today = timezone.now().date()
-    if day==0:
+    if day == 0:
         blogs = Blog.objects.filter(read_details__date=today)\
                         .values('id', 'title')\
                         .annotate(read_num_sum=Sum('read_details__read_num'))\
@@ -42,6 +44,7 @@ def get_hot_blogs(day):
             .annotate(read_num_sum=Sum('read_details__read_num')) \
             .order_by('-read_num_sum')
     return blogs[:7]
+
 
 def get_hot_blogs_cache(day, name):
     """
@@ -58,9 +61,9 @@ def get_hot_blogs_cache(day, name):
 
 def home(request):
     blog_content_type = ContentType.objects.get_for_model(Blog)
-    dates, read_nums =get_seven_days_read_data(blog_content_type)
+    dates, read_nums = get_seven_days_read_data(blog_content_type)
 
-    context = {}
+    context = dict()
     context['dates'] = dates
     context['read_nums'] = read_nums
     context['today_hot_data'] = get_hot_blogs_cache(0, 'today_hot_data')
@@ -77,3 +80,8 @@ def home(request):
     # context['hot_blogs_for_7_days'] = get_7_days_hot_blogs()
     return render(request, 'home.html', context)
 
+
+def my_notifications(request):
+    context = {}
+
+    return render(request, 'my_notifications.html', context)

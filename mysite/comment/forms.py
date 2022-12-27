@@ -4,6 +4,7 @@ from django.db.models import ObjectDoesNotExist
 from ckeditor.widgets import CKEditorWidget
 from .models import Comment
 
+
 class CommentForm(forms.Form):
     content_type = forms.CharField(widget=forms.HiddenInput)
     object_id = forms.IntegerField(widget=forms.HiddenInput)
@@ -16,13 +17,13 @@ class CommentForm(forms.Form):
         super(CommentForm, self).__init__(*args, **kwargs)
 
     def clean(self):
-        #判断用户是否登录
+        # 判断用户是否登录
         if self.user.is_authenticated:
             self.cleaned_data['user'] = self.user
         else:
             raise forms.ValidationError('用户尚未登录')
 
-        #评论对象验证
+        # 评论对象验证
         content_type = self.cleaned_data['content_type']
         object_id = self.cleaned_data['object_id']
         try:

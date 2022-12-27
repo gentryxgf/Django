@@ -8,6 +8,8 @@ from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 
 # Create your models here.
+"""
+.signals重构
 class SendMail(threading.Thread):
     def __init__(self, subject, text, email, fail_silently=False):
         self.subject = subject
@@ -25,6 +27,8 @@ class SendMail(threading.Thread):
             fail_silently=self.fail_silently,
             html_message=self.text,
         )
+        """
+
 
 class Comment(models.Model):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
@@ -42,6 +46,11 @@ class Comment(models.Model):
     def __str__(self):
         return self.text
 
+    def get_user(self):
+        return self.uesr
+
+    """
+    .signals重构
     def send_mail(self):
         # 发送邮件通知
         if self.parent is None:
@@ -60,6 +69,7 @@ class Comment(models.Model):
             text = render_to_string('comment/send_mail.html', context)
             send_mail = SendMail(subject, text, email)
             send_mail.start()
+            """
 
     class Meta:
         ordering = ['comment_time']

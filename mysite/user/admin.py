@@ -15,9 +15,11 @@ class UserAdmin(BaseUserAdmin):
         return obj.profile.nickname
     nickname.short_description = '昵称'
 
-#Re-register UserAdmin
+
+# Re-register UserAdmin
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
+
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):

@@ -15,6 +15,7 @@ class BlogType(models.Model):
     def __str__(self):
         return self.type_name
 
+
 class Blog(models.Model, ReadNumExpandMethod):
     title = models.CharField(max_length=50)
     blog_type = models.ForeignKey(BlogType, on_delete=models.CASCADE)
@@ -26,6 +27,9 @@ class Blog(models.Model, ReadNumExpandMethod):
 
     def get_url(self):
         return reverse('blog_detail', kwargs={'blog_pk': self.pk})
+
+    def get_user(self):
+        return self.author
 
     def get_email(self):
         return self.author.email
@@ -40,6 +44,7 @@ class Blog(models.Model, ReadNumExpandMethod):
 
     class Meta:
         ordering = ['-created_time']
+
 
 """class ReadNum(models.Model):
     read_num = models.IntegerField(default=0)
