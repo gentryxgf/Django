@@ -5,3 +5,7 @@
 body{
     margin-top: 70px!important;
 }
+
+.unread-count{
+    background-color: #d9534f !important;
+}

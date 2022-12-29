@@ -13,6 +13,7 @@ def send_notification_likes(sender, instance, **kwargs):
     elif instance.content_type.model == 'comment':
         comment = instance.content_object
         verb = '{0} 点赞了你的回复“{1}”'.format(instance.user.get_nickname_or_username(), strip_tags(comment.text))
+    url = instance.content_object.get_url()
     recipient = instance.content_object.get_user()
     # 发送消息
-    notify.send(instance.user, recipient=recipient, verb=verb, action_object=instance)
+    notify.send(instance.user, recipient=recipient, verb=verb, action_object=instance, url=url)

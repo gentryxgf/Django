@@ -2,12 +2,13 @@ import datetime
 
 from django.contrib.auth.models import User
 from django.db.models import Sum
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.contenttypes.models import ContentType
 from django.contrib import auth
 from django.urls import reverse
 from django.core.cache import cache
 from django.utils import timezone
+from notifications.models import Notification
 from read_statistics.utils import get_seven_days_read_data
 from blog.models import Blog
 from user.forms import LoginForm, RegForm
@@ -80,8 +81,3 @@ def home(request):
     # context['hot_blogs_for_7_days'] = get_7_days_hot_blogs()
     return render(request, 'home.html', context)
 
-
-def my_notifications(request):
-    context = {}
-
-    return render(request, 'my_notifications.html', context)

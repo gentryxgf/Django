@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'likes',
     'user',
     'notifications',
+    'my_notifications',
 
 ]
 
@@ -189,3 +190,8 @@ EMAIL_HOST_USER = '3607874906@qq.com'
 EMAIL_HOST_PASSWORD = 'itgfngnavxsfdaga'
 EMAIL_SUBJECT_PREFIX = '[肖高峰的博客]'
 EMAIL_USE_TLS = True
+
+# django-notifications-hq设置
+DJANGO_NOTIFICATIONS_CONFIG = {
+    'USE_JSONFIELD': True,
+}
