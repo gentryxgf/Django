@@ -25,7 +25,7 @@ SECRET_KEY = '22wg+g_^2g8kkd=m2s_g=l(g8an*pa4%hveve85t*2=*-a2jne'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [' xgf.pythonanywhere.com']
+ALLOWED_HOSTS = ['xgf.pythonanywhere.com']
 
 
 # Application definition
@@ -141,7 +141,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static:')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
